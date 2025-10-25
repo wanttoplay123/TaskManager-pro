@@ -102,3 +102,5 @@ async function limpiarArchivosHuerfanos() {
 
 // Ejecutar la limpieza
 limpiarArchivosHuerfanos();
+
+// Commit diario 11
