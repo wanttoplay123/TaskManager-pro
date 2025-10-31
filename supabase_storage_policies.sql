@@ -17,6 +17,8 @@ CREATE POLICY "Permitir ver adjuntos"
 ON storage.objects FOR SELECT 
 USING (bucket_id = 'adjuntos');
 
-CREATE POLICY "Permitir eliminar adjuntos" 
-ON storage.objects FOR DELETE 
+CREATE POLICY "Permitir eliminar adjuntos"
+ON storage.objects FOR DELETE
 USING (bucket_id = 'adjuntos');
+
+-- Commit diario 17
