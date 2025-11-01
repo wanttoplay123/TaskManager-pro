@@ -1,8 +1,8 @@
 const nodemailer = require('nodemailer');
 
 // Configuración de Gmail SMTP
-const GMAIL_USER = 'jdriverac08@gmail.com';
-const GMAIL_APP_PASSWORD = 'rukg pigd vvbj lvyf';
+const GMAIL_USER = process.env.GMAIL_USER || 'tu_email@gmail.com';
+const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD || 'tu_contraseña_de_aplicación';
 
 exports.handler = async (event, context) => {
     // Solo permitir POST

@@ -2,9 +2,9 @@
 
 ## ✅ COMPLETADO: Sistema de Email con Gmail Puro
 
-**Tu configuración actual:**
-- **Email:** `jdriverac08@gmail.com`
-- **Contraseña de aplicación:** `rukg pigd vvbj lvyf`
+**Ejemplo de configuración:**
+- **Email:** `tu_email@gmail.com`
+- **Contraseña de aplicación:** `tu_contraseña_de_aplicación`
 - **Método:** Función serverless de Netlify con Gmail SMTP directo
 - **Estado:** ✅ Configurado y desplegado
 
