@@ -1,0 +1,17 @@
+[build]
+  publish = "frontend"
+  functions = "netlify/functions"
+  command = "echo 'No build step required'"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://tu-servidor-backend.herokuapp.com/:splat"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

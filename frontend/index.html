@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskManager Pro - Sistema de Gestión de Tareas</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Barra de Navegación -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-tasks"></i>
+                <span>TaskManager Pro</span>
+            </div>
+            <div class="nav-menu">
+                <button class="nav-item active" onclick="mostrarSeccion('dashboard')">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </button>
+                <button class="nav-item" onclick="mostrarSeccion('tareas')">
+                    <i class="fas fa-list-check"></i> Tareas
+                </button>
+                <button class="nav-item" onclick="mostrarSeccion('usuarios')">
+                    <i class="fas fa-users"></i> Usuarios
+                </button>
+                <button class="nav-item" onclick="mostrarSeccion('reportes')">
+                    <i class="fas fa-chart-bar"></i> Reportes
+                </button>
+                <button class="nav-item" onclick="mostrarSeccion('configuracion')">
+                    <i class="fas fa-cog"></i> Configuración
+                </button>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Cambiar tema">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenedor Principal -->
+    <div class="main-container">
+        
+        <!-- SECCIÓN: DASHBOARD -->
+        <section id="dashboard" class="seccion active">
+            <div class="section-header">
+                <h1><i class="fas fa-chart-line"></i> Dashboard</h1>
+                <p>Vista general de todas tus tareas y estadísticas</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="stat-total">0</h3>
+                        <p>Total Tareas</p>
+                    </div>
+                </div>
+
+                <div class="stat-card success">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="stat-completadas">0</h3>
+                        <p>Completadas</p>
+                    </div>
+                </div>
+
+                <div class="stat-card warning">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="stat-pendientes">0</h3>
+                        <p>Pendientes</p>
+                    </div>
+                </div>
+
+                <div class="stat-card danger">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="stat-vencidas">0</h3>
+                        <p>Vencidas</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-content">
+                <div class="dashboard-col">
+                    <div class="card">
+                        <h3><i class="fas fa-fire"></i> Tareas por Prioridad</h3>
+                        <div id="chart-prioridad" class="chart-container"></div>
+                    </div>
+                </div>
+
+                <div class="dashboard-col">
+                    <div class="card">
+                        <h3><i class="fas fa-user-check"></i> Tareas por Usuario</h3>
+                        <div id="chart-usuario" class="chart-container"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-20">
+                <h3><i class="fas fa-bell"></i> Tareas Próximas a Vencer</h3>
+                <div id="tareas-proximas" class="tareas-list"></div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: TAREAS -->
+        <section id="tareas" class="seccion">
+            <div class="section-header">
+                <div>
+                    <h1><i class="fas fa-list-check"></i> Gestión de Tareas</h1>
+                    <p>Administra todas las tareas del equipo</p>
+                </div>
+                <button class="btn btn-primary" onclick="abrirModalTarea()">
+                    <i class="fas fa-plus"></i> Nueva Tarea
+                </button>
+            </div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <input type="text" id="filtro-buscar" placeholder="🔍 Buscar tareas..." onkeyup="filtrarTareas()">
+                </div>
+                <div class="filter-group">
+                    <select id="filtro-estado" onchange="filtrarTareas()">
+                        <option value="">Todos los Estados</option>
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="En Progreso">En Progreso</option>
+                        <option value="Completada">Completada</option>
+                        <option value="Cancelada">Cancelada</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <select id="filtro-prioridad" onchange="filtrarTareas()">
+                        <option value="">Todas las Prioridades</option>
+                        <option value="Urgente">Urgente</option>
+                        <option value="Alta">Alta</option>
+                        <option value="Media">Media</option>
+                        <option value="Baja">Baja</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="tareas-kanban">
+                <div class="kanban-column">
+                    <div class="kanban-header pendiente">
+                        <i class="fas fa-clock"></i> Pendiente
+                        <span class="badge" id="count-pendiente">0</span>
+                    </div>
+                    <div class="kanban-body" id="kanban-pendiente"></div>
+                </div>
+
+                <div class="kanban-column">
+                    <div class="kanban-header progreso">
+                        <i class="fas fa-spinner"></i> En Progreso
+                        <span class="badge" id="count-progreso">0</span>
+                    </div>
+                    <div class="kanban-body" id="kanban-progreso"></div>
+                </div>
+
+                <div class="kanban-column">
+                    <div class="kanban-header completada">
+                        <i class="fas fa-check-circle"></i> Completada
+                        <span class="badge" id="count-completada">0</span>
+                    </div>
+                    <div class="kanban-body" id="kanban-completada"></div>
+                </div>
+
+                <div class="kanban-column">
+                    <div class="kanban-header cancelada">
+                        <i class="fas fa-times-circle"></i> Cancelada
+                        <span class="badge" id="count-cancelada">0</span>
+                    </div>
+                    <div class="kanban-body" id="kanban-cancelada"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: USUARIOS -->
+        <section id="usuarios" class="seccion">
+            <div class="section-header">
+                <div>
+                    <h1><i class="fas fa-users"></i> Gestión de Usuarios</h1>
+                    <p>Administra los miembros del equipo</p>
+                </div>
+                <button class="btn btn-primary" onclick="abrirModalUsuario()">
+                    <i class="fas fa-user-plus"></i> Nuevo Usuario
+                </button>
+            </div>
+
+            <div class="card">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Área</th>
+                                <th>Teléfono</th>
+                                <th>Tareas Asignadas</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-usuarios">
+                            <!-- Se llenará dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: REPORTES -->
+        <section id="reportes" class="seccion">
+            <div class="section-header">
+                <h1><i class="fas fa-chart-bar"></i> Reportes y Análisis</h1>
+                <p>Análisis cuantitativo y cualitativo del desempeño</p>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-calendar-alt"></i> Seleccionar Período</h3>
+                <div class="filters">
+                    <div class="filter-group">
+                        <label>Fecha Inicio:</label>
+                        <input type="date" id="reporte-fecha-inicio">
+                    </div>
+                    <div class="filter-group">
+                        <label>Fecha Fin:</label>
+                        <input type="date" id="reporte-fecha-fin">
+                    </div>
+                    <button class="btn btn-primary" onclick="generarReportes()">
+                        <i class="fas fa-sync"></i> Generar Reporte
+                    </button>
+                </div>
+            </div>
+
+            <div class="dashboard-content mt-20">
+                <div class="dashboard-col">
+                    <div class="card">
+                        <h3><i class="fas fa-calculator"></i> Análisis Cuantitativo</h3>
+                        <div id="reporte-cuantitativo" class="reporte-content">
+                            <p class="text-muted">Selecciona un período y genera el reporte</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-col">
+                    <div class="card">
+                        <h3><i class="fas fa-clipboard-list"></i> Análisis Cualitativo</h3>
+                        <div id="reporte-cualitativo" class="reporte-content">
+                            <p class="text-muted">Selecciona un período y genera el reporte</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: CONFIGURACIÓN -->
+        <section id="configuracion" class="seccion">
+            <div class="section-header">
+                <h1><i class="fas fa-cog"></i> Configuración</h1>
+                <p>Configura las notificaciones y preferencias del sistema</p>
+            </div>
+
+            <!-- Tipos de Tareas -->
+            <div class="card">
+                <h3><i class="fas fa-tags"></i> Tipos de Tareas y Áreas</h3>
+                <p class="text-muted mb-20">Define tipos de tareas predefinidos para categorizar el trabajo</p>
+                
+                <button class="btn btn-primary" onclick="abrirModalTipoTarea()" style="margin-bottom: 20px;">
+                    <i class="fas fa-plus"></i> Nuevo Tipo de Tarea
+                </button>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Área</th>
+                                <th>Descripción</th>
+                                <th>Color</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-tipos-tarea">
+                            <!-- Se llenará dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3><i class="fas fa-envelope"></i> Configuración de Email</h3>
+                <p class="text-muted mb-20">Configura el servidor SMTP para enviar notificaciones por correo</p>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Servidor SMTP:</label>
+                        <input type="text" id="config-smtp-host" placeholder="smtp.gmail.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Puerto:</label>
+                        <input type="number" id="config-smtp-port" placeholder="587">
+                    </div>
+                    <div class="form-group">
+                        <label>Usuario/Email:</label>
+                        <input type="email" id="config-smtp-user" placeholder="tu_email@gmail.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Contraseña:</label>
+                        <input type="password" id="config-smtp-pass" placeholder="Contraseña de aplicación">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="config-notif-email" checked>
+                        Enviar notificaciones por email
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>Anticipación de notificación (minutos):</label>
+                    <input type="number" id="config-notif-anticipadas" value="60" min="5" max="1440">
+                    <small class="text-muted">Enviar recordatorio X minutos antes del vencimiento</small>
+                </div>
+
+                <button class="btn btn-success" onclick="guardarConfiguracion()">
+                    <i class="fas fa-save"></i> Guardar Configuración
+                </button>
+                <button class="btn btn-primary" onclick="probarEmail()" style="margin-left: 10px;">
+                    <i class="fas fa-paper-plane"></i> Enviar Email de Prueba
+                </button>
+
+                <div class="alert info mt-20">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>Nota para Gmail:</strong> Necesitas generar una "Contraseña de aplicación" en tu cuenta de Google.
+                        <a href="https://support.google.com/accounts/answer/185833" target="_blank">Ver tutorial</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- MODAL: CREAR/EDITAR TAREA -->
+    <div id="modal-tarea" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-tarea-titulo"><i class="fas fa-plus"></i> Nueva Tarea</h2>
+                <button class="modal-close" onclick="cerrarModalTarea()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-tarea" onsubmit="guardarTarea(event)">
+                    <div class="form-group">
+                        <label>Título de la Tarea: *</label>
+                        <input type="text" id="tarea-titulo" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Descripción:</label>
+                        <textarea id="tarea-descripcion" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Prioridad: *</label>
+                            <select id="tarea-prioridad" required>
+                                <option value="Baja">Baja</option>
+                                <option value="Media" selected>Media</option>
+                                <option value="Alta">Alta</option>
+                                <option value="Urgente">Urgente</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Estado: *</label>
+                            <select id="tarea-estado" required>
+                                <option value="Pendiente" selected>Pendiente</option>
+                                <option value="En Progreso">En Progreso</option>
+                                <option value="Completada">Completada</option>
+                                <option value="Cancelada">Cancelada</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Tipo de Tarea:</label>
+                            <select id="tarea-tipo">
+                                <option value="">Seleccionar tipo...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Área:</label>
+                            <input type="text" id="tarea-area" placeholder="ej: Administrativa, Operativa">
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Asignar a: *</label>
+                            <select id="tarea-usuario" required>
+                                <option value="">Seleccionar usuario...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Categoría:</label>
+                            <input type="text" id="tarea-categoria" placeholder="ej: Desarrollo, Diseño, etc.">
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Fecha de Vencimiento:</label>
+                            <input type="datetime-local" id="tarea-fecha-vencimiento">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tiempo Estimado (minutos):</label>
+                            <input type="number" id="tarea-tiempo-estimado" min="0">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Notas Adicionales:</label>
+                        <textarea id="tarea-notas" rows="2"></textarea>
+                    </div>
+
+                    <input type="hidden" id="tarea-id">
+
+                    <!-- Sección de Adjuntos (solo al editar) -->
+                    <div id="seccion-adjuntos" style="display: none;">
+                        <hr style="margin: 20px 0;">
+                        <h4><i class="fas fa-paperclip"></i> Archivos Adjuntos</h4>
+                        
+                        <div class="form-group">
+                            <label>Subir archivo:</label>
+                            <input type="file" id="tarea-archivo" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.gif,.zip,.rar">
+                            <button type="button" class="btn btn-secondary" onclick="subirAdjunto()" style="margin-top: 10px;">
+                                <i class="fas fa-upload"></i> Subir
+                            </button>
+                        </div>
+
+                        <div id="lista-adjuntos" class="adjuntos-list"></div>
+                    </div>
+
+                    <!-- Sección de Comentarios (solo al editar) -->
+                    <div id="seccion-comentarios" style="display: none;">
+                        <hr style="margin: 20px 0;">
+                        <h4><i class="fas fa-comments"></i> Comentarios e Historial</h4>
+                        
+                        <div class="form-group">
+                            <textarea id="nuevo-comentario" rows="2" placeholder="Escribe un comentario..."></textarea>
+                            <button type="button" class="btn btn-secondary" onclick="agregarComentario()" style="margin-top: 10px;">
+                                <i class="fas fa-paper-plane"></i> Enviar Comentario
+                            </button>
+                        </div>
+
+                        <div id="lista-comentarios" class="comentarios-list"></div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="cerrarModalTarea()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Guardar Tarea
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CREAR/EDITAR USUARIO -->
+    <div id="modal-usuario" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-usuario-titulo"><i class="fas fa-user-plus"></i> Nuevo Usuario</h2>
+                <button class="modal-close" onclick="cerrarModalUsuario()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-usuario" onsubmit="guardarUsuario(event)">
+                    <div class="form-group">
+                        <label>Nombre Completo: *</label>
+                        <input type="text" id="usuario-nombre" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email: *</label>
+                        <input type="email" id="usuario-email" required>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Área/Departamento:</label>
+                            <input type="text" id="usuario-area" placeholder="ej: Desarrollo, Ventas">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Teléfono:</label>
+                            <input type="tel" id="usuario-telefono" placeholder="+52 123 456 7890">
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="usuario-id">
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="cerrarModalUsuario()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Guardar Usuario
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CREAR/EDITAR TIPO DE TAREA -->
+    <div id="modal-tipo-tarea" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-tipo-tarea-titulo"><i class="fas fa-tag"></i> Nuevo Tipo de Tarea</h2>
+                <button class="modal-close" onclick="cerrarModalTipoTarea()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-tipo-tarea" onsubmit="guardarTipoTarea(event)">
+                    <div class="form-group">
+                        <label>Nombre del Tipo: *</label>
+                        <input type="text" id="tipo-nombre" required placeholder="ej: Redactar Acta">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Área: *</label>
+                        <input type="text" id="tipo-area" required placeholder="ej: Administrativa">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Descripción:</label>
+                        <textarea id="tipo-descripcion" rows="3" placeholder="Describe el tipo de tarea..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Color (para identificación visual):</label>
+                        <input type="color" id="tipo-color" value="#3b82f6">
+                    </div>
+
+                    <input type="hidden" id="tipo-id">
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="cerrarModalTipoTarea()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Guardar Tipo
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>

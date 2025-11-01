@@ -1,0 +1,5 @@
+# Redirecciones para API - ACTUALIZA CON TU URL REAL DEL BACKEND
+/api/*  https://tu-backend-url.herokuapp.com/:splat  200
+
+# Página principal
+/*    /index.html   200

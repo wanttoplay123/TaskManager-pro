@@ -1,0 +1,8 @@
+{
+  "name": "taskmanager-functions",
+  "version": "1.0.0",
+  "description": "Serverless functions for TaskManager Pro",
+  "dependencies": {
+    "nodemailer": "^6.9.7"
+  }
+}
